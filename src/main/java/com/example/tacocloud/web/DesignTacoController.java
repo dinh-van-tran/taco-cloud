@@ -3,8 +3,10 @@ package com.example.tacocloud.web;
 import com.example.tacocloud.Ingredient;
 import com.example.tacocloud.Taco;
 import com.example.tacocloud.TacoOrder;
+import com.example.tacocloud.data.IngredientRepository;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 // automatically generate an SLF4J Logger static property for the class.
 @Slf4j
@@ -22,19 +25,16 @@ import java.util.stream.Collectors;
 // This means that the "tacoOrder" object will be available across multiple requests.
 @SessionAttributes("tacoOrder")
 public class DesignTacoController {
+    private final IngredientRepository ingredientRepository;
+
+    @Autowired
+    public DesignTacoController(IngredientRepository ingredientRepository) {
+        this.ingredientRepository = ingredientRepository;
+    }
+
     @ModelAttribute
     public void addIngredientsToModel(Model model) {
-        List<Ingredient> ingredientList = Arrays.asList(
-                new Ingredient("FLTO", "Flour Tortilla", Ingredient.Type.WRAP),
-                new Ingredient("COTO", "Corn Tortilla", Ingredient.Type.WRAP),
-                new Ingredient("GRBF", "Ground Beef", Ingredient.Type.PROTEIN),
-                new Ingredient("CARN", "Carnitas", Ingredient.Type.PROTEIN),
-                new Ingredient("TMTO", "Diced Tomatoes", Ingredient.Type.VEGGIES),
-                new Ingredient("LETC", "Lettuce", Ingredient.Type.VEGGIES),
-                new Ingredient("CHED", "Cheddar", Ingredient.Type.CHEESE),
-                new Ingredient("JACK", "Monterrey Jack", Ingredient.Type.CHEESE),
-                new Ingredient("SLSA", "Salsa", Ingredient.Type.SAUCE),
-                new Ingredient("SRCR", "Sour Cream", Ingredient.Type.SAUCE));
+        Iterable<Ingredient> ingredientList = ingredientRepository.findAll();
 
         Ingredient.Type[] types = Ingredient.Type.values();
         for (Ingredient.Type type : types) {
@@ -70,8 +70,9 @@ public class DesignTacoController {
         return "redirect:/orders/current";
     }
 
-    private Iterable<Ingredient> filterByType(List<Ingredient> ingredientList, Ingredient.Type type) {
-        return ingredientList.stream().filter(x -> x.getType().equals(type))
+    private Iterable<Ingredient> filterByType(Iterable<Ingredient> ingredientList, Ingredient.Type type) {
+        return StreamSupport.stream(ingredientList.spliterator(), false)
+                .filter(i -> i.getType().equals(type))
                 .collect(Collectors.toList());
     }
 }
