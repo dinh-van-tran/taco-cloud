@@ -4,6 +4,7 @@ import com.example.tacocloud.User;
 import com.example.tacocloud.data.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@EnableMethodSecurity
 class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -38,6 +40,8 @@ class SecurityConfig {
                     authorize
                             // if url starts with /design or /orders, user must have USER role
                             .requestMatchers("/design", "/orders/**").hasAuthority("ROLE_USER")
+                            // if url starts with /admin, user must have ADMIN role
+                            .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                             // allow access to all other URLs
                             .anyRequest().permitAll();
                 })

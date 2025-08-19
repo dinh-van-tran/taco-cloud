@@ -5,6 +5,7 @@ import com.example.tacocloud.User;
 import com.example.tacocloud.data.OrderRepository;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
@@ -62,5 +63,10 @@ class OrderController {
         sessionStatus.setComplete();
 
         return "redirect:/";
+    }
+
+    @PostAuthorize("hasAuthority('ROLE_ADMIN') || returnObject.user.username == authentication.name")
+    public TacoOrder getOrder(long id) {
+        return orderRepository.findById(id).orElse(null);
     }
 }

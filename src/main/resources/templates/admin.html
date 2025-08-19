@@ -1,0 +1,21 @@
+<!-- tag::all[] -->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Taco Cloud</title>
+</head>
+
+<body>
+    <h1>Admin page</h1>
+    <h2>Welcome, <span th:text="${user.fullName}">NAME</span>?</h2>
+
+    <div th:if="${error}">
+        Unable to login. Check your username and password.
+    </div>
+
+    <form method="POST" th:action="@{/admin/deleteOrders}" id="deleteAllOrdersForm">
+        <input type="submit" value="Delete All Order"/>
+    </form>
+</body>
+</html>
