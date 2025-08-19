@@ -6,16 +6,15 @@ import com.example.tacocloud.TacoOrder;
 import com.example.tacocloud.User;
 import com.example.tacocloud.data.IngredientRepository;
 import com.example.tacocloud.data.TacoRepository;
-import com.example.tacocloud.data.UserRepository;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -29,12 +28,10 @@ import java.util.stream.StreamSupport;
 public class DesignTacoController {
     private final IngredientRepository ingredientRepository;
     private final TacoRepository tacoRepository;
-    private final UserRepository userRepository;
 
     @Autowired
-    public DesignTacoController(IngredientRepository ingredientRepository, UserRepository userRepository, TacoRepository tacoRepository) {
+    public DesignTacoController(IngredientRepository ingredientRepository, TacoRepository tacoRepository) {
         this.ingredientRepository = ingredientRepository;
-        this.userRepository = userRepository;
         this.tacoRepository = tacoRepository;
     }
 
@@ -60,13 +57,8 @@ public class DesignTacoController {
     }
 
     @ModelAttribute(name = "user")
-    public User user(Principal principal) {
-        if (principal == null) {
-            return null; // No user is authenticated
-        }
-
-        String username = principal.getName();
-        return userRepository.findByUsername(username);
+    public User user(@AuthenticationPrincipal User user) {
+        return user;
     }
 
     @GetMapping
