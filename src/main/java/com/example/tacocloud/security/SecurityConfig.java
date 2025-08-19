@@ -1,17 +1,16 @@
 package com.example.tacocloud.security;
 
+import com.example.tacocloud.User;
+import com.example.tacocloud.data.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 class SecurityConfig {
@@ -21,28 +20,42 @@ class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-        List<UserDetails> usersList = new ArrayList<>();
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
+        return username -> {
+            User user = userRepository.findByUsername(username);
+            if (user != null) {
+                return user;
+            }
 
-        // add a new user with username "buzz" and password "password"
-        usersList.add(new User(
-                "buzz",
-                passwordEncoder.encode("password"),
-                List.of(
-                        new SimpleGrantedAuthority("ROLE_USER")
+            throw new UsernameNotFoundException(String.format("User '%s' not found.", username));
+        };
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+                .authorizeHttpRequests(authorize -> {
+                    authorize
+                            // if url starts with /design or /orders, user must have USER role
+                            .requestMatchers("/design", "/orders/**").hasAuthority("ROLE_USER")
+                            // allow access to all other URLs
+                            .anyRequest().permitAll();
+                })
+                .formLogin(form -> form
+                        // replace default login page with custom one
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/design")
+                        .permitAll()
                 )
-        ));
+                .logout(option -> option.logoutSuccessUrl("/"))
 
-        // add a new user with username "woody" and password "password"
-        usersList.add(new User(
-                "woody",
-                passwordEncoder.encode("password"),
-                List.of(
-                        new SimpleGrantedAuthority("ROLE_USER")
-                )
-        ));
+                // Make H2-Console non-secured; for debug purposes
+                .csrf(option -> option.ignoringRequestMatchers("/h2-console/**"))
 
-        // in-memory user details manager
-        return new InMemoryUserDetailsManager(usersList);
+                // Allow pages to be loaded in frames from the same origin; needed for H2-Console
+                .headers(headers -> {
+                    headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin);
+                })
+                .build();
     }
 }

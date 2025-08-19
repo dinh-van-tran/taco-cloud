@@ -3,7 +3,11 @@ package com.example.tacocloud.web;
 import com.example.tacocloud.Ingredient;
 import com.example.tacocloud.Taco;
 import com.example.tacocloud.TacoOrder;
+import com.example.tacocloud.User;
 import com.example.tacocloud.data.IngredientRepository;
+import com.example.tacocloud.data.OrderRepository;
+import com.example.tacocloud.data.TacoRepository;
+import com.example.tacocloud.data.UserRepository;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.List;
+import java.security.Principal;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -26,10 +29,14 @@ import java.util.stream.StreamSupport;
 @SessionAttributes("tacoOrder")
 public class DesignTacoController {
     private final IngredientRepository ingredientRepository;
+    private final TacoRepository tacoRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public DesignTacoController(IngredientRepository ingredientRepository) {
+    public DesignTacoController(IngredientRepository ingredientRepository, UserRepository userRepository, TacoRepository tacoRepository) {
         this.ingredientRepository = ingredientRepository;
+        this.userRepository = userRepository;
+        this.tacoRepository = tacoRepository;
     }
 
     @ModelAttribute
@@ -53,6 +60,16 @@ public class DesignTacoController {
         return new Taco();
     }
 
+    @ModelAttribute(name = "user")
+    public User user(Principal principal) {
+        if (principal == null) {
+            return null; // No user is authenticated
+        }
+
+        String username = principal.getName();
+        return userRepository.findByUsername(username);
+    }
+
     @GetMapping
     public String showDesignForm() {
         return "design";
@@ -61,11 +78,13 @@ public class DesignTacoController {
     @PostMapping
     public String processTaco(@Valid Taco taco, Errors errors, @ModelAttribute TacoOrder tacoOrder) {
         if (errors.hasErrors()) {
-            log.debug("Validation errors found");
+            log.info("Validation errors found");
             return "design";
         }
 
-        tacoOrder.addTaco(taco);
+        Taco saved = tacoRepository.save(taco);
+        tacoOrder.addTaco(saved);
+
         log.info("Processing taco: {}", taco);
         return "redirect:/orders/current";
     }
