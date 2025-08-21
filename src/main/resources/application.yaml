@@ -4,4 +4,7 @@ spring:
   datasource:
     generate-unique-name: false
     name: taco-cloud
-#    url: jdbc:h2:mem:taco-cloud
+    #    url: jdbc:h2:mem:taco-cloud
+  data:
+    rest:
+      base-path: data-api
