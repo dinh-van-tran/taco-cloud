@@ -14,9 +14,11 @@ import java.util.Date;
 import java.util.List;
 
 import lombok.Data;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 @Data
 @Entity
+@RestResource(rel = "taco-orders", path = "taco-orders")
 public class TacoOrder implements Serializable {
 
     @Serial
