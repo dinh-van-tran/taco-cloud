@@ -2,10 +2,10 @@ package com.example.tacocloud.web.api;
 
 import com.example.tacocloud.Ingredient;
 import com.example.tacocloud.data.IngredientRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -18,7 +18,19 @@ class IngredientController {
     }
 
     @GetMapping
-    public List<Ingredient> findAll() {
+    public List<Ingredient> findAll(Principal user) {
         return ingredientRepository.findAll();
+    }
+
+    @PutMapping
+    @PreAuthorize("hasAuthority('SCOPE_taco-cloud-api/writeIngredients')")
+    public Ingredient save(@RequestBody Ingredient ingredient) {
+        return ingredientRepository.save(ingredient);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_taco-cloud-api/deleteIngredients')")
+    public void deleteById(@PathVariable String id) {
+        ingredientRepository.deleteById(id);
     }
 }
