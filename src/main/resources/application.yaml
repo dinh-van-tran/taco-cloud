@@ -30,8 +30,8 @@ spring:
   rabbitmq:
     host: localhost
     port: 5672
-    username: admin
-    password: admin
+    username: default_user_dHW1RsGf0Pgl9pb3TrA
+    password: S25nuULoPbiFwCxxKH3fKbjfvQxQfQl5
     template:
       exchange: tacocloud.order
       routing-key: kitchens.central

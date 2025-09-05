@@ -7,5 +7,5 @@
   + Kind
 - The solution is to use a different tool [kekspose](https://github.com/scholzj/kekspose) to expose the kafka broker outside the cluster.
 ```bash
-kekspose --namespace kafka --service kafka-cluster
+kekspose --namespace kafka --cluster-name kafka-cluster
  ```
