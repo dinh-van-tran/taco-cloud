@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: artemis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: artemis
+  template:
+    metadata:
+      labels:
+        app: artemis
+    spec:
+      containers:
+        - name: artemis
+          image: apache/activemq-artemis:latest-alpine
+          ports:
+            - containerPort: 61616 # AMQP
+            - containerPort: 8161  # Web console
+          env:
+            - name: ARTEMIS_USER
+              value: admin
+            - name: ARTEMIS_PASSWORD
+              value: admin
+          volumeMounts:
+            - name: artemis-data
+              mountPath: /var/lib/artemis
+      volumes:
+        - name: artemis-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: artemis
+spec:
+  type: LoadBalancer
+  selector:
+    app: artemis
+  ports:
+    - protocol: TCP
+      name: amqp
+      port: 61616
+      targetPort: 61616
+    - protocol: TCP
+      name: web
+      port: 8161
+      targetPort: 8161

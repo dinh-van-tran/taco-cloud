@@ -1,0 +1,9 @@
+### Obtain an OAuth2 token using the authorization code flow
+POST /oauth2/token
+Host: localhost:9000
+Authorization: Basic dGFjby1hZG1pbi1jbGllbnQ6c2VjcmV0
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code&
+redirect_uri=http://127.0.0.1:9090/login/oauth2/code/taco-admin-client-oidc&
+code=604yx5OMd2pz6L0xG8yhq0w8Vp6EdVHJfivBUAU-gE6MhKsnfyYBixC8lQGoIjeVGlBese5M_SFvv8ueiYom_6AbPVCIsJa8BkmgPd94ulntl9TYoObf2rHUFqO4tNBv

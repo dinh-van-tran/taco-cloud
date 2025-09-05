@@ -1,10 +1,12 @@
 spring:
   application:
     name: taco-cloud
+
   datasource:
     generate-unique-name: false
     name: taco-cloud
     #    url: jdbc:h2:mem:taco-cloud
+
   data:
     rest:
       base-path: data-api
@@ -15,3 +17,30 @@ spring:
         jwt:
           issuer-uri: https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_0le4G5DHH
           jwk-set-uri: https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_0le4G5DHH/.well-known/jwks.json
+
+  artemis:
+    broker-url: tcp://localhost:61616
+    user: admin
+    password: admin
+
+  jms:
+    template:
+      default-destination: tacocloud.order.queue
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
+    template:
+      exchange: tacocloud.order
+      routing-key: kitchens.central
+
+  kafka:
+    bootstrap-servers:
+      - localhost:50000
+    template:
+      default-topic: tacocloud.orders.topic
+    producer:
+      key-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
