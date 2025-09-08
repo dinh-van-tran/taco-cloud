@@ -5,22 +5,22 @@ import com.tacocloud.TacoOrder;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-@Primary
+@Profile("amqp-producer")
 @Service
-public class RabbitOrderMessagingService implements OrderMessagingService {
-    private RabbitTemplate rabbitTemplate;
+public class AmqpOrderMessagingService implements OrderMessagingService {
+    private final RabbitTemplate rabbitTemplate;
 
     @Autowired
-    public RabbitOrderMessagingService(RabbitTemplate rabbitTemplate) {
+    public AmqpOrderMessagingService(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
     @Override
     public void sendOrder(TacoOrder order) {
-        rabbitTemplate.convertAndSend(order, RabbitOrderMessagingService::postProcessMessage);
+        rabbitTemplate.convertAndSend(order, AmqpOrderMessagingService::postProcessMessage);
     }
 
     private static Message postProcessMessage(Message message) {

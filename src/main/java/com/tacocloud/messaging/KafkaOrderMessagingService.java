@@ -3,10 +3,12 @@ package com.tacocloud.messaging;
 import com.tacocloud.TacoOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 //@Primary
+@Profile("kafka-producer")
 @Service
 public class KafkaOrderMessagingService implements OrderMessagingService {
     private KafkaTemplate<String, TacoOrder> kafkaTemplate;

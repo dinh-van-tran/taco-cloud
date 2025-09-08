@@ -1,4 +1,14 @@
 spring:
+  profiles:
+    active: pulsar-producer
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: jms-producer
+
   application:
     name: taco-cloud
 
@@ -27,6 +37,32 @@ spring:
     template:
       default-destination: tacocloud.order.queue
 
+---
+
+spring:
+  config:
+    activate:
+      on-profile: amqp-producer
+
+  application:
+    name: taco-cloud
+
+  datasource:
+    generate-unique-name: false
+    name: taco-cloud
+    #    url: jdbc:h2:mem:taco-cloud
+
+  data:
+    rest:
+      base-path: data-api
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_0le4G5DHH
+          jwk-set-uri: https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_0le4G5DHH/.well-known/jwks.json
+
   rabbitmq:
     host: localhost
     port: 5672
@@ -36,6 +72,32 @@ spring:
       exchange: tacocloud.order
       routing-key: kitchens.central
 
+---
+
+spring:
+  config:
+    activate:
+      on-profile: kafka-producer
+
+  application:
+    name: taco-cloud
+
+  datasource:
+    generate-unique-name: false
+    name: taco-cloud
+    #    url: jdbc:h2:mem:taco-cloud
+
+  data:
+    rest:
+      base-path: data-api
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_0le4G5DHH
+          jwk-set-uri: https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_0le4G5DHH/.well-known/jwks.json
+
   kafka:
     bootstrap-servers:
       - localhost:50000
@@ -44,3 +106,40 @@ spring:
     producer:
       key-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: pulsar-producer
+
+  application:
+    name: taco-cloud
+
+  datasource:
+    generate-unique-name: false
+    name: taco-cloud
+    #    url: jdbc:h2:mem:taco-cloud
+
+  data:
+    rest:
+      base-path: data-api
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_0le4G5DHH
+          jwk-set-uri: https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_0le4G5DHH/.well-known/jwks.json
+
+  pulsar:
+    client:
+      service-url: pulsar://pulsar-mini-proxy:6650
+    defaults:
+      topic:
+        tenant: apache
+        namespace: pulsar
+        enabled: true
+    producer:
+      topic-name: taco-order

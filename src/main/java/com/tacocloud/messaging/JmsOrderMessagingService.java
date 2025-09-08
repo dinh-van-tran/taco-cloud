@@ -4,9 +4,11 @@ import com.tacocloud.TacoOrder;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
+@Profile("jms-producer")
 @Service
 class JmsOrderMessagingService implements OrderMessagingService {
     private final JmsTemplate jmsTemplate;

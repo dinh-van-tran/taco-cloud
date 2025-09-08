@@ -1,17 +1,17 @@
 package com.tacocloud.messaging;
 
 import com.tacocloud.TacoOrder;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Profile("jms-listener")
 @Configuration
-public class MessageConfig {
-
+public class JmsMessageConfig {
     @Bean
     public MappingJackson2MessageConverter mappingJackson2MessageConverter() {
         MappingJackson2MessageConverter messageConverter =
@@ -23,11 +23,6 @@ public class MessageConfig {
         messageConverter.setTypeIdMappings(typeIdMappings);
 
         return messageConverter;
-    }
-
-    @Bean
-    public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
     }
 }
 
