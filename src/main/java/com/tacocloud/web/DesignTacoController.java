@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -73,8 +74,8 @@ public class DesignTacoController {
             return "design";
         }
 
-        Taco saved = tacoRepository.save(taco);
-        tacoOrder.addTaco(saved);
+        Mono<Taco> saved = tacoRepository.save(taco);
+        tacoOrder.addTaco(saved.block());
 
         log.info("Processing taco: {}", taco);
         return "redirect:/orders/current";

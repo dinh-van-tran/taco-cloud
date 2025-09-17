@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import reactor.core.publisher.Mono;
 
 import java.security.Principal;
 
@@ -25,7 +26,7 @@ class AdminController {
     }
 
     @ModelAttribute(name = "user")
-    public User user(Principal principal) {
+    public Mono<User> user(Principal principal) {
         if (principal == null) {
             return null; // No user is authenticated
         }
@@ -41,7 +42,7 @@ class AdminController {
 
     @PostMapping("/deleteOrders")
     public String deleteAllOrders() {
-        orderAdminService.deleteAllOrders();
+        orderAdminService.deleteAllOrders().block();
         return "redirect:/admin";
     }
 }

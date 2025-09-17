@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping(
@@ -35,21 +37,21 @@ public class OrderApiController {
     }
 
     @GetMapping(produces="application/json")
-    public Iterable<TacoOrder> allOrders() {
+    public Flux<TacoOrder> allOrders() {
         return repo.findAll();
     }
 
     @PostMapping(consumes="application/json")
     @ResponseStatus(HttpStatus.CREATED)
-    public TacoOrder postOrder(@RequestBody TacoOrder order) {
+    public Mono<TacoOrder> postOrder(@RequestBody TacoOrder order) {
         var result = repo.save(order);
-        messageService.sendOrder(result);
+        messageService.sendOrder(result.block());
 
         return result;
     }
 
     @PutMapping(path="/{orderId}", consumes="application/json")
-    public TacoOrder putOrder(
+    public Mono<TacoOrder> putOrder(
             @PathVariable("orderId") Long orderId,
             @RequestBody TacoOrder order) {
         order.setId(orderId);
@@ -57,9 +59,12 @@ public class OrderApiController {
     }
 
     @PatchMapping(path="/{orderId}", consumes="application/json")
-    public TacoOrder patchOrder(@PathVariable("orderId") Long orderId,
-                                @RequestBody TacoOrder patch) {
-        var result = repo.findById(orderId);
+    public Mono<TacoOrder> patchOrder(
+            @PathVariable("orderId") Long orderId,
+            @RequestBody TacoOrder patch
+    ) {
+        var monoResult = repo.findById(orderId);
+        var result = monoResult.blockOptional();
         if (result.isEmpty()) {
             // return 404
              throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found");
@@ -103,9 +108,10 @@ public class OrderApiController {
 
     @DeleteMapping("/{orderId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteOrder(@PathVariable("orderId") Long orderId) {
+    public Mono<Void> deleteOrder(@PathVariable("orderId") Long orderId) {
         try {
-            repo.deleteById(orderId);
+            return repo.deleteById(orderId);
         } catch (EmptyResultDataAccessException ignored) {}
+        return null;
     }
 }

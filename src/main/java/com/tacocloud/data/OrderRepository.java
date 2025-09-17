@@ -2,41 +2,42 @@ package com.tacocloud.data;
 
 import com.tacocloud.TacoOrder;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.data.rest.core.annotation.RestResource;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Date;
-import java.util.List;
 
-public interface OrderRepository extends CrudRepository<TacoOrder, Long> {
-    List<TacoOrder> findByDeliveryZip(String deliveryZip);
+public interface OrderRepository extends ReactiveCrudRepository<TacoOrder, Long> {
+    Flux<TacoOrder> findByDeliveryZip(String deliveryZip);
 
-    List<TacoOrder> findByDeliveryZipAndPlacedAtBetween(String deliveryZip, Date startDate, Date endDate);
+    Flux<TacoOrder> findByDeliveryZipAndPlacedAtBetween(String deliveryZip, Date startDate, Date endDate);
 
-    List<TacoOrder> findByDeliveryNameIgnoreCaseAndDeliveryCityIgnoreCase(String deliveryName, String deliveryCity);
+    Flux<TacoOrder> findByDeliveryNameIgnoreCaseAndDeliveryCityIgnoreCase(String deliveryName, String deliveryCity);
 
-    List<TacoOrder> findByDeliveryCityOrderByDeliveryName(String deliveryCity);
+    Flux<TacoOrder> findByDeliveryCityOrderByDeliveryName(String deliveryCity);
 
     @Query("SELECT o from TacoOrder o where o.deliveryCity = 'Seattle'")
-    List<TacoOrder> findByDeliveryInSeattle();
+    Flux<TacoOrder> findByDeliveryInSeattle();
 
     @Override
     @RestResource(exported = false)
-    void deleteById(Long aLong);
+    Mono<Void> deleteById(Long aLong);
 
     @Override
     @RestResource(exported = false)
-    void delete(TacoOrder entity);
+    Mono<Void> delete(TacoOrder entity);
 
     @Override
     @RestResource(exported = false)
-    void deleteAllById(Iterable<? extends Long> longs);
+    Mono<Void> deleteAllById(Iterable<? extends Long> longs);
 
     @Override
     @RestResource(exported = false)
-    void deleteAll(Iterable<? extends TacoOrder> entities);
+    Mono<Void> deleteAll(Iterable<? extends TacoOrder> entities);
 
     @Override
     @RestResource(exported = false)
-    void deleteAll();
+    Mono<Void> deleteAll();
 }

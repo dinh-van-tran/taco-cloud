@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,12 +35,13 @@ class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return username -> {
-            User user = userRepository.findByUsername(username);
-            if (user != null) {
-                return user;
+            Mono<User> monoUser = userRepository.findByUsername(username);
+            var optionUser = monoUser.blockOptional();
+            if (optionUser.isEmpty()) {
+                throw new UsernameNotFoundException(String.format("User '%s' not found.", username));
             }
 
-            throw new UsernameNotFoundException(String.format("User '%s' not found.", username));
+            return optionUser.get();
         };
     }
 

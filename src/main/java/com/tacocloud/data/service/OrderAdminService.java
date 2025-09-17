@@ -3,6 +3,7 @@ package com.tacocloud.data.service;
 import com.tacocloud.data.OrderRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 public class OrderAdminService {
@@ -13,7 +14,7 @@ public class OrderAdminService {
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public void deleteAllOrders() {
-        orderRepository.deleteAll();
+    public Mono<Void> deleteAllOrders() {
+        return orderRepository.deleteAll();
     }
 }
